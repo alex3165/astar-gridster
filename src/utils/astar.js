@@ -33,25 +33,41 @@ const getBoundNode = (matrix, direction) => {
 const mdistance = (start, end) =>
   Math.abs(end.x - start.x) + Math.abs(end.y - start.y);
 
+const adjacentNodes = (matrix, parentNode, endNode) => {
+  const shifts = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+  return shifts.map(([x, y]) => {
+    if (
+      !!matrix[parentNode.x + x] &&
+      // only if it is an active node (1)
+      !!matrix[parentNode.x + x][parentNode.y + y]
+    ) {
+      const childNode = new Node(parentNode.x + x, parentNode.y + y);
+      childNode.setWeight(mdistance(endNode, childNode));
+
+      return childNode;
+    }
+  });
+};
+
 export const findShortest = matrix => {
-  const start = getBoundNode(matrix, 'start');
-  const end = getBoundNode(matrix, 'end');
-
+  const startNode = getBoundNode(matrix, 'start');
+  const endNode = getBoundNode(matrix, 'end');
   const openList = new PriorityQueue();
-  openList.insert(start, start.f);
+  const closeList = new PriorityQueue();
 
-  const closeList = [];
+  openList.insert(startNode, startNode.f);
 
   while (openList.size()) {
-    const leastNode = openList.pop();
-    const neighbours = {};
+    const leastNode = openList.pop(); // retrieve value with the least weight
+    const adjacentNodes = adjacentNodes(matrix, leastNode, endNode);
 
-    if (!!matrix[leastNode.x - 1] && matrix[leastNode.x - 1][leastNode.y]) {
-      const leftNode = new Node(leastNode.x - 1, leastNode.y);
-      leftNode.setWeight(mdistance(end, leftNode));
+    adjacentNodes.forEach(childNode => {
+      // if
+      // if
+    });
 
-      neighbours.left = leftNode;
-    }
+    closeList.insert(leastNode, leastNode.f);
   }
 
   return matrix;
