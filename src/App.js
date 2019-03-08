@@ -1,25 +1,38 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Header from './Header';
+import Grid from './Grid';
+import { generateMatrix, updateMatrix } from './selectors';
+import { findShortest } from './utils/astar';
+const mock = require('./mock.json');
 
 class App extends Component {
+  state = {
+    matrix: mock
+  };
+
+  onUpdateGrid = ({ rows, columns }) => {
+    this.setState({
+      matrix: generateMatrix(rows, columns)
+    });
+  };
+
+  onClickCell = (i, j) => {
+    const updatedMatrix = findShortest(updateMatrix(this.state.matrix, i, j));
+
+    this.setState({
+      matrix: updatedMatrix
+    });
+  };
+
+  printState = () => {
+    console.log(JSON.stringify(this.state.matrix));
+  };
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div onDoubleClick={this.printState}>
+        <Header submit={this.onUpdateGrid} />
+        <Grid matrix={this.state.matrix} onClickCell={this.onClickCell} />
       </div>
     );
   }
