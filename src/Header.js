@@ -5,11 +5,30 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin: 20px 0px;
 `;
 
-const Text = styled.input``;
+const Text = styled.input`
+  outline: none;
+  margin: 0px 10px;
+  border-radius: 5px;
+  border: 1px solid #dfe4ea;
+`;
 
-const Button = styled.button``;
+const Button = styled.button`
+  padding: 10px 16px;
+  border: 1px solid #393996;
+  background-color: #5352ed;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  margin: 0px 20px;
+
+  :hover {
+    background-color: #393996;
+  }
+`;
 
 export default class Header extends Component {
   state = {
@@ -23,6 +42,13 @@ export default class Header extends Component {
 
   updateVal = dir => e => {
     const val = e.currentTarget.value;
+
+    if (!val) {
+      return this.setState({
+        [dir]: val
+      });
+    }
+
     if (parseInt(val)) {
       this.setState({
         [dir]: parseInt(val)
@@ -35,7 +61,6 @@ export default class Header extends Component {
   };
 
   render() {
-    const { submit } = this.props;
     return (
       <Wrapper>
         <Text

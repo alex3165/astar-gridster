@@ -1,6 +1,6 @@
 import { range } from 'lodash';
 
-const random = int => Math.floor(Math.random() * (int + 1));
+const random = int => Math.floor(Math.random() * int);
 
 export const generateMatrix = (rows, columns) => {
   const randomStart = random(columns);

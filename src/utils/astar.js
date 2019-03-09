@@ -25,20 +25,16 @@ const adjacentNodes = (matrix, parentNode) => {
   const shifts = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
   return shifts
-    .map(([x, y]) => {
-      if (
+    .filter(
+      ([x, y]) =>
         !!matrix[parentNode.x + x] &&
-        // only if it is an active node (1)
         !!matrix[parentNode.x + x][parentNode.y + y]
-      ) {
-        const childNode = new Node(parentNode.x + x, parentNode.y + y);
-
-        childNode.setParentNode(parentNode);
-
-        return childNode;
-      }
-    })
-    .filter(Boolean);
+    )
+    .map(([x, y]) => {
+      const childNode = new Node(parentNode.x + x, parentNode.y + y);
+      childNode.setParentNode(parentNode);
+      return childNode;
+    });
 };
 
 const tracePath = (node, arr = []) => {
@@ -54,14 +50,14 @@ export const findShortest = matrix => {
   const endNode = getBoundNode(matrix, 'end');
   const startNode = getBoundNode(matrix, 'start');
   const openList = new PriorityQueue();
-  const closeList = {};
+  const closeDictionary = {};
   let foundNode;
 
   openList.insert(startNode, startNode.f);
 
   while (openList.size()) {
     const leastNode = openList.pop(); // retrieve value with the least weight
-    closeList[leastNode.toKey()] = leastNode; // add node with least weight to close list
+    closeDictionary[leastNode.toKey()] = leastNode; // add node with least weight to close dictionary
 
     // Get neighbor nodes: left / right / bottom / top
     const neighbors = adjacentNodes(matrix, leastNode, endNode);
@@ -77,8 +73,8 @@ export const findShortest = matrix => {
       const h = mdistance(endNode, neighbor);
       const f = g + h;
 
-      // If the node is in closed list ignore it
-      if (closeList[neighbor.toKey()]) {
+      // If the node is in close dictionary ignore it
+      if (closeDictionary[neighbor.toKey()]) {
         return false;
       }
 

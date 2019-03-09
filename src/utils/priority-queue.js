@@ -1,6 +1,5 @@
 export class PriorityQueue {
-  constructor(reverse) {
-    this.reverse = !!reverse;
+  constructor() {
     this.heap = [];
   }
 
