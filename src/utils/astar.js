@@ -34,11 +34,11 @@ const getBoundNode = (matrix, direction) => {
   matrix.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell === 3 && direction === 'start') {
-        node = new Node(i, j, 0, 0, Infinity);
+        node = new Node(i, j, 0, Infinity, Infinity);
       }
 
       if (cell === 4 && direction === 'end') {
-        node = new Node(i, j, 0, 0, Infinity);
+        node = new Node(i, j, 0, 0);
       }
     });
   });
@@ -49,7 +49,7 @@ const getBoundNode = (matrix, direction) => {
 const mdistance = (start, end) =>
   Math.abs(end.x - start.x) + Math.abs(end.y - start.y);
 
-const adjacentNodes = (matrix, parentNode, endNode) => {
+const adjacentNodes = (matrix, parentNode) => {
   const shifts = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
   return shifts
@@ -61,11 +61,12 @@ const adjacentNodes = (matrix, parentNode, endNode) => {
       ) {
         const childNode = new Node(parentNode.x + x, parentNode.y + y);
 
-        const g = parentNode.g + 1;
-        const h = mdistance(endNode, childNode);
-        const f = g + h;
+        // const g = parentNode.g + 1;
+        // const h = mdistance(endNode, childNode);
+        // const f = g + h;
 
-        childNode.setWeight(g, h, f).setParentNode(parentNode);
+        childNode.setParentNode(parentNode);
+        // console.log(g, h, f, childNode);
 
         return childNode;
       }
@@ -74,36 +75,49 @@ const adjacentNodes = (matrix, parentNode, endNode) => {
 };
 
 export const findShortest = matrix => {
-  const startNode = getBoundNode(matrix, 'start');
   const endNode = getBoundNode(matrix, 'end');
+  const startNode = getBoundNode(matrix, 'start');
   const openList = new PriorityQueue();
   const closeList = {};
   let foundNode;
 
   openList.insert(startNode, startNode.f);
-
+  // console.log(startNode);
   while (openList.size()) {
     const leastNode = openList.pop(); // retrieve value with the least weight
+    closeList[leastNode.toKey()] = true; // add node with least weight to close list
+
     const neighbors = adjacentNodes(matrix, leastNode, endNode);
-    console.log(leastNode);
+    let g;
+    let h;
+    let f;
+
     neighbors.forEach(childNode => {
       if (childNode.x === endNode.x && childNode.y === endNode.y) {
         foundNode = childNode;
       }
 
-      if (!closeList[childNode.toKey()] && childNode.f < childNode.parent.f) {
-        openList.insert(childNode, childNode.f);
+      if (!closeList[childNode.toKey()]) {
+        g = leastNode.g + 1;
+        h = mdistance(endNode, childNode);
+        f = g + h;
+
+        childNode.setWeight(g, h, f);
+        console.log(childNode);
+
+        if (
+          childNode.parent.f === Infinity ||
+          childNode.f <= childNode.parent.f
+        ) {
+          openList.insert(childNode, childNode.f);
+        }
       }
     });
 
     if (foundNode) {
       break;
     }
-
-    closeList[leastNode.toKey()] = true;
   }
-
-  // console.log(foundNode);
 
   return [];
 };
