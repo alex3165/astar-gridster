@@ -17,9 +17,9 @@ export default class Header extends Component {
     columns: 10
   };
 
-  // componentWillMount() {
-  //   this.submit();
-  // }
+  componentWillMount() {
+    this.submit();
+  }
 
   updateVal = dir => e => {
     const val = e.currentTarget.value;

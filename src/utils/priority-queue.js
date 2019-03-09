@@ -35,6 +35,22 @@ export class PriorityQueue {
     return this.heap.shift()[0];
   }
 
+  has(x, y) {
+    const foundNode = this.heap.find(
+      ([val, priority]) => val.x === x && val.y === y
+    );
+
+    return !!foundNode;
+  }
+
+  get({ x, y }) {
+    const foundNode = this.heap.find(
+      ([val, priority]) => val.x === x && val.y === y
+    );
+
+    return foundNode && foundNode[0];
+  }
+
   pop(priority) {
     if (priority) {
       return this.heap.pop();

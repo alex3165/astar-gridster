@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import Header from './Header';
 import Grid from './Grid';
-import { generateMatrix, updateMatrix } from './selectors';
+import {
+  generateMatrix,
+  updateMatrix,
+  updateMatrixWithShortest
+} from './selectors';
 import { findShortest } from './utils/astar';
-const mock = require('./mock.json');
 
 class App extends Component {
-  state = {
-    matrix: mock
-  };
+  state = {};
 
   onUpdateGrid = ({ rows, columns }) => {
     this.setState({
@@ -17,20 +18,24 @@ class App extends Component {
   };
 
   onClickCell = (i, j) => {
-    const updatedMatrix = findShortest(updateMatrix(this.state.matrix, i, j));
+    let updatedMatrix = updateMatrix(this.state.matrix, i, j);
+    const shortest = findShortest(updatedMatrix);
+
+    if (shortest.length) {
+      updatedMatrix = updateMatrixWithShortest(
+        updatedMatrix,
+        shortest.reverse()
+      );
+    }
 
     this.setState({
       matrix: updatedMatrix
     });
   };
 
-  printState = () => {
-    console.log(JSON.stringify(this.state.matrix));
-  };
-
   render() {
     return (
-      <div onDoubleClick={this.printState}>
+      <div>
         <Header submit={this.onUpdateGrid} />
         <Grid matrix={this.state.matrix} onClickCell={this.onClickCell} />
       </div>

@@ -30,3 +30,23 @@ export const updateMatrix = (matrix, i, j) => {
     });
   });
 };
+
+export const updateMatrixWithShortest = (matrix, shortestPath) => {
+  return matrix.map((rows, colIndex) => {
+    return rows.map((cell, rowIndex) => {
+      let shortestIndex;
+      for (const [x, y] of shortestPath) {
+        if (x === colIndex && y === rowIndex) {
+          shortestIndex = 2;
+          break;
+        }
+      }
+
+      if (cell === 2 && !shortestIndex) {
+        return 1;
+      }
+
+      return cell === 1 && shortestIndex ? shortestIndex : cell;
+    });
+  });
+};

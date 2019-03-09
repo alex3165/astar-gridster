@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 
 const statusMap = {
-  0: '#fafafa', // filled
+  0: '#f6f6f6', // filled
   1: '#fff', // clear
   2: '#ff7f50', // shortest
   3: '#2ed573', // start

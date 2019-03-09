@@ -1,33 +1,5 @@
 import { PriorityQueue } from './priority-queue';
-
-class Node {
-  constructor(x, y, g, h, f) {
-    this.x = x;
-    this.y = y;
-
-    this.g = g;
-    this.h = h;
-    this.f = f;
-    this.parent = undefined;
-  }
-
-  toKey() {
-    return `${this.x}${this.y}`;
-  }
-
-  setWeight(g, h, f) {
-    this.g = g;
-    this.h = h;
-    this.f = f;
-
-    return this;
-  }
-
-  setParentNode(node) {
-    this.parent = node;
-    return this;
-  }
-}
+import { Node } from './model';
 
 const getBoundNode = (matrix, direction) => {
   let node;
@@ -61,17 +33,21 @@ const adjacentNodes = (matrix, parentNode) => {
       ) {
         const childNode = new Node(parentNode.x + x, parentNode.y + y);
 
-        // const g = parentNode.g + 1;
-        // const h = mdistance(endNode, childNode);
-        // const f = g + h;
-
         childNode.setParentNode(parentNode);
-        // console.log(g, h, f, childNode);
 
         return childNode;
       }
     })
     .filter(Boolean);
+};
+
+const tracePath = (node, arr = []) => {
+  if (node.parent) {
+    arr.push([node.x, node.y]);
+    return tracePath(node.parent, arr);
+  }
+
+  return arr;
 };
 
 export const findShortest = matrix => {
@@ -82,42 +58,52 @@ export const findShortest = matrix => {
   let foundNode;
 
   openList.insert(startNode, startNode.f);
-  // console.log(startNode);
+
   while (openList.size()) {
     const leastNode = openList.pop(); // retrieve value with the least weight
-    closeList[leastNode.toKey()] = true; // add node with least weight to close list
+    closeList[leastNode.toKey()] = leastNode; // add node with least weight to close list
 
+    // Get neighbor nodes: left / right / bottom / top
     const neighbors = adjacentNodes(matrix, leastNode, endNode);
-    let g;
-    let h;
-    let f;
 
-    neighbors.forEach(childNode => {
-      if (childNode.x === endNode.x && childNode.y === endNode.y) {
-        foundNode = childNode;
+    foundNode = neighbors.find(neighbor => {
+      // Destination node found
+      if (neighbor.x === endNode.x && neighbor.y === endNode.y) {
+        return true;
       }
 
-      if (!closeList[childNode.toKey()]) {
-        g = leastNode.g + 1;
-        h = mdistance(endNode, childNode);
-        f = g + h;
+      // Calculate weights (steps to next node / manhattan heuristic / sum of the previous )
+      const g = leastNode.g + 1;
+      const h = mdistance(endNode, neighbor);
+      const f = g + h;
 
-        childNode.setWeight(g, h, f);
-        console.log(childNode);
-
-        if (
-          childNode.parent.f === Infinity ||
-          childNode.f <= childNode.parent.f
-        ) {
-          openList.insert(childNode, childNode.f);
-        }
+      // If the node is in closed list ignore it
+      if (closeList[neighbor.toKey()]) {
+        return false;
       }
+
+      // if the neighbor node is not in the open list set its weight, parent and add it to the open list
+      if (!openList.has(neighbor.x, neighbor.y)) {
+        neighbor.setWeight(g, h, f);
+        neighbor.setParentNode(leastNode);
+        openList.insert(neighbor, neighbor.f);
+        return false;
+      }
+
+      // Get neighbor node from the open list, opdate its weight according to new weight
+      const openNeighbor = openList.get(neighbor);
+      if (g < openNeighbor.g) {
+        openNeighbor.setWeight(g, h, f);
+      }
+
+      return false;
     });
 
+    // Node found abort while loop
     if (foundNode) {
       break;
     }
   }
 
-  return [];
+  return foundNode ? tracePath(foundNode) : [];
 };
